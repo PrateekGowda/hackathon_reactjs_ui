@@ -6,7 +6,7 @@ const EC2Provision = () => {
   const [formData, setFormData] = useState({
     name: '',
     instanceType: '',
-    storageSize: 30,
+    storageSize: '30',
     osType: 'linux'
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -127,7 +127,6 @@ const EC2Provision = () => {
         <div className="form-group">
           <label htmlFor="storageSize">Storage Size (GB):</label>
           <input
-            type="number"
             id="storageSize"
             name="storageSize"
             value={formData.storageSize}
