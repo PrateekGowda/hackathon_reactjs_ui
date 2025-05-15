@@ -57,12 +57,6 @@ const RVToolsParser = () => {
         const sheetData = XLSX.utils.sheet_to_json(worksheet);
         
         if (sheetData && sheetData.length > 0) {
-          // Extract the first VM's data
-          const vm = sheetData[0];
-          
-          // Dynamically create prompt string from all available fields
-          const promptParts = [];
-          
           // Map of common field names to standardized names
           const fieldMappings = {
             'NumCPU': 'VCPU',
@@ -75,19 +69,24 @@ const RVToolsParser = () => {
             'GuestOS': 'OperatingSystem'
           };
           
-          // Process all fields in the VM data
-          Object.keys(vm).forEach(key => {
-            if (vm[key] !== null && vm[key] !== undefined && vm[key] !== '') {
-              // Use mapped field name if available, otherwise use original
-              const fieldName = fieldMappings[key] || key;
-              promptParts.push(`${fieldName}:${vm[key]}`);
-            }
+          // Process all VMs in the sheet
+          const allVMs = sheetData.map(vm => {
+            const promptParts = [];
+            
+            // Process all fields in the VM data
+            Object.keys(vm).forEach(key => {
+              if (vm[key] !== null && vm[key] !== undefined && vm[key] !== '') {
+                // Use mapped field name if available, otherwise use original
+                const fieldName = fieldMappings[key] || key;
+                promptParts.push(`${fieldName}:${vm[key]}`);
+              }
+            });
+            
+            return promptParts.join(',');
           });
           
-          const promptString = promptParts.join(',');
-          
-          // Set the formatted JSON data
-          setJsonData({ prompt: promptString });
+          // Set the formatted JSON data with all VMs
+          setJsonData({ prompts: allVMs });
           setSuccess('Excel file successfully parsed to required format');
         } else {
           setError('No data found in the Excel file');
@@ -125,18 +124,11 @@ const RVToolsParser = () => {
     setSuccess('');
 
     try {
-      // Extract the path from the full URL to use with the local proxy
-      let path;
-      try {
-        const urlObj = new URL(lambdaUrl);
-        path = urlObj.pathname;
-      } catch (e) {
-        // If URL parsing fails, use the input as is
-        path = lambdaUrl;
-      }
+      // Use the full Lambda URL instead of just the path
+      const path = lambdaUrl;
       
-      // Use relative URL which will be proxied through the development server
-      const response = await axios.post(path, jsonData, {
+      // Process all VMs at once in a single request
+      const response = await axios.post(path, { prompts: jsonData.prompts }, {
         headers: {
           'Content-Type': 'application/json'
         },
