@@ -102,3 +102,29 @@
 .tab-content {
   padding: 20px 0;
 }
+
+/* API Response Styles */
+.response-container {
+  margin-top: 20px;
+  background-color: #f0f8ff;
+  border-radius: 4px;
+  padding: 15px;
+  border: 1px solid #b3e0ff;
+}
+
+.response-container h4 {
+  margin-top: 0;
+  color: #0066cc;
+  margin-bottom: 10px;
+}
+
+.response-data {
+  background-color: #f8f8f8;
+  padding: 10px;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-family: monospace;
+  font-size: 14px;
+  white-space: pre-wrap;
+  border: 1px solid #ddd;
+}
