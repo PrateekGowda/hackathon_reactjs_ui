@@ -1,0 +1,24 @@
+schemaVersion: 2.0.0
+metadata:
+  name: rvtools-parser
+  version: 1.0.0
+  displayName: RVTools Parser React Application
+  description: React application to parse RVTools Excel exports
+components:
+  - name: dev
+    container:
+      image: public.ecr.aws/aws-mde/universal-image:latest
+      memoryLimit: 2Gi
+commands:
+  - id: install
+    exec:
+      component: dev
+      commandLine: "npm install"
+  - id: build
+    exec:
+      component: dev
+      commandLine: "npm run build"
+  - id: test
+    exec:
+      component: dev
+      commandLine: "npm run test"
