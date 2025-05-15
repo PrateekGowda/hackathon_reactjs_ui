@@ -26,10 +26,10 @@ const EC2Provision = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!apiUrl) {
-      setError('Please enter the AWS API Gateway endpoint');
-      return;
-    }
+    //if (!apiUrl) {
+    //  setError('Please enter the AWS API Gateway endpoint');
+    //  return;
+    // }
 
     setIsLoading(true);
     setError('');
