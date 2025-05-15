@@ -114,10 +114,10 @@ const RVToolsParser = () => {
       return;
     }
 
-    if (!lambdaUrl) {
-      setError('Please enter the AWS Lambda function URL');
-      return;
-    }
+    // if (!lambdaUrl) {
+    //   setError('Please enter the AWS Lambda function URL');
+    //   return;
+    // }
 
     setIsLoading(true);
     setError('');
@@ -125,7 +125,8 @@ const RVToolsParser = () => {
 
     try {
       // Use the full Lambda URL instead of just the path
-      const path = lambdaUrl;
+      // const path = lambdaUrl;
+      const path = "https://oizh1vz6i4.execute-api.us-east-1.amazonaws.com/default/test-Cost-estimation-pricing-bedrock";
       
       // Process all VMs at once in a single request
       const response = await axios.post(path, { prompts: jsonData.prompts }, {
@@ -213,7 +214,7 @@ const RVToolsParser = () => {
 
       <div className="submit-section">
         <h2>Submit to AWS Lambda</h2>
-        <div className="input-group">
+        {/* <div className="input-group">
           <label htmlFor="lambda-url">AWS Lambda API Gateway Endpoint:</label>
           <input
             type="text"
@@ -223,10 +224,7 @@ const RVToolsParser = () => {
             placeholder="https://pq1khgwtxa.execute-api.us-east-1.amazonaws.com/default/Cost-estimation-pricing-bedrock"
             className="text-input"
           />
-        </div>
-        <div className="note">
-          <small>Using local proxy for development testing. For production, configure CORS on API Gateway.</small>
-        </div>
+        </div> */}
         <button 
           onClick={submitToLambda} 
           disabled={!jsonData || !lambdaUrl || isLoading}
