@@ -13,7 +13,7 @@ const EC2Provision = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [apiResponse, setApiResponse] = useState(null);
-  #const [apiUrl, setApiUrl] = useState('');
+  // const [apiUrl, setApiUrl] = useState('');
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
