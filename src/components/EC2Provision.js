@@ -4,49 +4,61 @@ import './Provision.css';
 
 const EC2Provision = () => {
   const [formData, setFormData] = useState({
-    instance_name: '',
-    instance_type: '',
-    storage: '',
-    os_type: ''
+    name: '',
+    instanceType: '',
+    storageSize: 30,
+    osType: 'linux'
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [lambdaUrl, setLambdaUrl] = useState('');
+  const [apiResponse, setApiResponse] = useState(null);
+  const [apiUrl, setApiUrl] = useState('');
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value
+      [name]: name === 'storageSize' ? parseInt(value, 10) : value
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!lambdaUrl) {
-      setError('Please enter the AWS Lambda function URL');
+    if (!apiUrl) {
+      setError('Please enter the AWS API Gateway endpoint');
       return;
     }
 
     setIsLoading(true);
     setError('');
     setSuccess('');
+    setApiResponse(null);
 
     try {
       // Extract the path from the full URL to use with the local proxy
       let path;
       try {
-        const urlObj = new URL(lambdaUrl);
+        const urlObj = new URL(apiUrl);
         path = urlObj.pathname;
       } catch (e) {
         // If URL parsing fails, use the input as is
-        path = lambdaUrl;
+        path = apiUrl;
       }
       
+      // Prepare the payload in the expected format
+      const payload = {
+        osType: formData.osType,
+        instanceType: formData.instanceType,
+        name: formData.name,
+        storageSize: formData.storageSize
+      };
+      
+      console.log('Sending payload to API:', payload);
+      
       // Use relative URL which will be proxied through the development server
-      const response = await axios.post(path, formData, {
+      const response = await axios.post(path, payload, {
         headers: {
           'Content-Type': 'application/json'
         },
@@ -55,17 +67,19 @@ const EC2Provision = () => {
 
       if (response.data) {
         setSuccess('EC2 instance provisioning initiated successfully!');
+        setApiResponse(response.data);
+        console.log('API Response:', response.data);
       } else {
-        setError('Lambda function returned an error: Unknown error');
+        setError('API Gateway returned an error: Unknown error');
       }
       setIsLoading(false);
     } catch (err) {
-      console.error('Error submitting to Lambda:', err);
-      let errorMsg = 'Failed to submit data to AWS Lambda. ';
+      console.error('Error submitting to API Gateway:', err);
+      let errorMsg = 'Failed to submit data to AWS API Gateway. ';
       if (err.code === 'ECONNABORTED') {
         errorMsg += 'Request timed out. Please check your network connection.';
       } else if (err.message === 'Network Error') {
-        errorMsg += 'Network error. Please check if the Lambda URL is correct.';
+        errorMsg += 'Network error. Please check if the API URL is correct.';
       } else {
         errorMsg += (err.response?.data?.message || err.message);
       }
@@ -78,24 +92,25 @@ const EC2Provision = () => {
     <div className="provision-form">
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label htmlFor="instance_name">Instance Name:</label>
+          <label htmlFor="name">Instance Name:</label>
           <input
             type="text"
-            id="instance_name"
-            name="instance_name"
-            value={formData.instance_name}
+            id="name"
+            name="name"
+            value={formData.name}
             onChange={handleInputChange}
             required
             className="form-control"
+            placeholder="MyLinuxInstance-test"
           />
         </div>
         
         <div className="form-group">
-          <label htmlFor="instance_type">Instance Type:</label>
+          <label htmlFor="instanceType">Instance Type:</label>
           <select
-            id="instance_type"
-            name="instance_type"
-            value={formData.instance_type}
+            id="instanceType"
+            name="instanceType"
+            value={formData.instanceType}
             onChange={handleInputChange}
             required
             className="form-control"
@@ -110,12 +125,12 @@ const EC2Provision = () => {
         </div>
         
         <div className="form-group">
-          <label htmlFor="storage">Storage (GB):</label>
+          <label htmlFor="storageSize">Storage Size (GB):</label>
           <input
             type="number"
-            id="storage"
-            name="storage"
-            value={formData.storage}
+            id="storageSize"
+            name="storageSize"
+            value={formData.storageSize}
             onChange={handleInputChange}
             required
             className="form-control"
@@ -124,30 +139,27 @@ const EC2Provision = () => {
         </div>
         
         <div className="form-group">
-          <label htmlFor="os_type">OS Type:</label>
+          <label htmlFor="osType">OS Type:</label>
           <select
-            id="os_type"
-            name="os_type"
-            value={formData.os_type}
+            id="osType"
+            name="osType"
+            value={formData.osType}
             onChange={handleInputChange}
             required
             className="form-control"
           >
-            <option value="">Select OS</option>
-            <option value="Amazon Linux 2">Amazon Linux 2</option>
-            <option value="Ubuntu">Ubuntu</option>
-            <option value="Windows">Windows</option>
-            <option value="RHEL">RHEL</option>
+            <option value="linux">Linux</option>
+            <option value="windows">Windows</option>
           </select>
         </div>
         
         <div className="form-group">
-          <label htmlFor="lambda-url">AWS Lambda API Gateway Endpoint:</label>
+          <label htmlFor="api-url">AWS API Gateway Endpoint:</label>
           <input
             type="text"
-            id="lambda-url"
-            value={lambdaUrl}
-            onChange={(e) => setLambdaUrl(e.target.value)}
+            id="api-url"
+            value={apiUrl}
+            onChange={(e) => setApiUrl(e.target.value)}
             placeholder="https://your-api-gateway-endpoint.amazonaws.com/stage/function"
             className="form-control"
             required
@@ -165,6 +177,15 @@ const EC2Provision = () => {
       
       {error && <div className="error-message">{error}</div>}
       {success && <div className="success-message">{success}</div>}
+      
+      {apiResponse && (
+        <div className="response-container">
+          <h4>API Response:</h4>
+          <pre className="response-data">
+            {JSON.stringify(apiResponse, null, 2)}
+          </pre>
+        </div>
+      )}
     </div>
   );
 };
