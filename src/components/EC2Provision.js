@@ -38,7 +38,7 @@ const EC2Provision = () => {
 
     try {
       // Extract the path from the full URL to use with the local proxy
-      const path = "https://ln43fib1z6.execute-api.us-east-1.amazonaws.com/default/EC2-Generation-testnew";
+      const path = "https://rhfiv2ztf8.execute-api.us-east-1.amazonaws.com/default/EC2-generation";
 
       
       // Prepare the payload in the expected format
