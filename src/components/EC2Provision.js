@@ -6,7 +6,7 @@ const EC2Provision = () => {
   const [formData, setFormData] = useState({
     name: '',
     instanceType: '',
-    storageSize: '30',
+    storageSize: 30,
     osType: 'linux'
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -38,14 +38,8 @@ const EC2Provision = () => {
 
     try {
       // Extract the path from the full URL to use with the local proxy
-      let path;
-      try {
-        const urlObj = new URL(apiUrl);
-        path = urlObj.pathname;
-      } catch (e) {
-        // If URL parsing fails, use the input as is
-        path = apiUrl;
-      }
+      const path = "https://ln43fib1z6.execute-api.us-east-1.amazonaws.com/default/EC2-Generation-testnew";
+
       
       // Prepare the payload in the expected format
       const payload = {
@@ -127,6 +121,7 @@ const EC2Provision = () => {
         <div className="form-group">
           <label htmlFor="storageSize">Storage Size (GB):</label>
           <input
+            type="number"
             id="storageSize"
             name="storageSize"
             value={formData.storageSize}
@@ -152,18 +147,18 @@ const EC2Provision = () => {
           </select>
         </div>
         
-        <div className="form-group">
+        {/* <div className="form-group">
           <label htmlFor="api-url">AWS API Gateway Endpoint:</label>
           <input
             type="text"
             id="api-url"
             value={apiUrl}
             onChange={(e) => setApiUrl(e.target.value)}
-            placeholder="https://your-api-gateway-endpoint.amazonaws.com/stage/function"
+            placeholder="https://ln43fib1z6.execute-api.us-east-1.amazonaws.com/default/EC2-Generation-testnew"
             className="form-control"
             required
           />
-        </div>
+        </div> */}
         
         <button 
           type="submit" 
