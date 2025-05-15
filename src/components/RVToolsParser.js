@@ -227,7 +227,7 @@ const RVToolsParser = () => {
         </div> */}
         <button 
           onClick={submitToLambda} 
-          disabled={!jsonData || !lambdaUrl || isLoading}
+          disabled={!jsonData || isLoading}
           className="action-button submit-button"
         >
           {isLoading ? 'Submitting...' : 'Submit to AWS Lambda'}
